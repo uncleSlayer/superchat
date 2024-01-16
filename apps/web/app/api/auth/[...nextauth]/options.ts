@@ -12,11 +12,13 @@ export const authOptions: AuthOptions = {
     callbacks: {
         signIn: async (user) => {
             if (user.user.email && user.user.image && user.user.name) {
-                const userInDb = prisma.user.findFirst({
+                const userInDb = await prisma.user.findFirst({
                     where: {
                         email: user.user.email
                     }
                 })
+                console.log(userInDb);
+                
                 if (!userInDb) {
                     await prisma.user.create({
                         data: {

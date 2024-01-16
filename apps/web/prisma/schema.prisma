@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,8 +8,24 @@ datasource db {
 }
 
 model User {
-  id String @id @default(uuid())
-  name String
-  email String
-  imageUrl String
+  id                    String          @id @default(uuid())
+  name                  String
+  email                 String
+  imageUrl              String
+  FriendRequestSent     FriendRequest[] @relation("sender")
+  FriendRequestReceived FriendRequest[] @relation("receiver")
+}
+
+model FriendRequest {
+  id             String              @id @default(uuid())
+  sender         User                @relation("sender", fields: [senderUserId], references: [id])
+  senderUserId   String
+  receiver       User                @relation("receiver", fields: [receiverUserId], references: [id])
+  receiverUserId String
+  status         FriendRequestStatus @default(PENDING)
+}
+
+enum FriendRequestStatus {
+  PENDING
+  RESOLVED
 }

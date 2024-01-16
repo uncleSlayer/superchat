@@ -23,7 +23,6 @@ class SocketService {
     onEvents() {
         this._io.on('connection', (socket) => {
             console.log('socket connected: ' + socket.id);
-
         })
     }
 }

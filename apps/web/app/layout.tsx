@@ -4,6 +4,7 @@ import './globals.css'
 import Nav from '@/components/app/nav/Nav'
 import AuthProvider from '@/contexts/AuthProvider'
 import SocketProvider from '@/contexts/SocketProvider'
+import { ThemeProvider } from '@/contexts/ThemeProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,10 +21,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+
         <SocketProvider>
           <AuthProvider>
-            <Nav />
-            {children}
+            <ThemeProvider attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange>
+              <Nav />
+              {children}
+            </ThemeProvider>
           </AuthProvider>
         </SocketProvider>
       </body>

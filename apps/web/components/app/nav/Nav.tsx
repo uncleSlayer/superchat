@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { Button } from "@/components/ui/button"
+import { ModeToggle } from '@/components/ui/themeToggler'
 import {
     Popover,
     PopoverContent,
@@ -17,10 +18,12 @@ const Nav = () => {
     const { data: session } = useSession()
 
     return (
-        <Card className="main-container fixed top-0 left-0 right-0 md:top-4 md:left-4 md:right-4 rounded-none border md:border-none md:rounded-2xl shadow-lg">
+        <Card className="main-container fixed top-0 left-0 right-0 md:top-4 md:left-4 md:right-4 rounded-none md:border-none md:rounded-2xl shadow-lg">
             <div className='flex justify-between items-center'>
-                <div>
+                <div className='flex gap-2 items-center'>
                     <h3 className='text-lg'>SuperChat</h3>
+                    <ModeToggle />
+
                 </div>
                 <div className='relative'>
                     {

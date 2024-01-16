@@ -1,9 +1,14 @@
+import SearchFriends from '@/components/app/friends/SearchFriends'
 import React from 'react'
+import FriendsTable from '@/components/app/friends/FriendsTable'
 
 const page = () => {
     return (
         <div className='main-container mt-20'>
-            <p>Hello my beautiful friends</p>
+            <SearchFriends />
+            <div className='flex gap-3 flex-col md:flex-row'>
+                <FriendsTable />
+            </div>
         </div>
     )
 }
