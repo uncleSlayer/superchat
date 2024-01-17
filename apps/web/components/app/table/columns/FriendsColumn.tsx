@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { ColumnDef } from "@tanstack/react-table"
 import axios from "axios"
 
-export type FriendRequestsSent = {
+export type FriendRequests = {
     receiver: string,
     receiverId: string
 }
@@ -27,7 +27,7 @@ const handleRejectButton = async (receiver: string) => {
 
 }
 
-export const FriendRequestsColumns: ColumnDef<FriendRequestsSent>[] = [
+export const FriendRequestsColumns: ColumnDef<FriendRequests>[] = [
     {
         accessorKey: "receiver",
         header: "Sent to",

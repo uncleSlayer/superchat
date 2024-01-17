@@ -1,7 +1,7 @@
 'use client'
 
 import { Card } from "@/components/ui/card"
-import { FriendRequestsColumns } from "../table/columns/FriendRequestSentColumn"
+import { FriendRequestsSent, FriendRequestsColumns } from "../table/columns/FriendRequestSentColumn"
 import { DataTable } from "../table/table/Data-table"
 import { useEffect, useState } from "react"
 import axios from "axios"

@@ -21,9 +21,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-
-        <SocketProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <SocketProvider>
             <ThemeProvider attribute="class"
               defaultTheme="system"
               enableSystem
@@ -31,8 +30,8 @@ export default function RootLayout({
               <Nav />
               {children}
             </ThemeProvider>
-          </AuthProvider>
-        </SocketProvider>
+          </SocketProvider>
+        </AuthProvider>
       </body>
     </html>
   )
