@@ -1,7 +1,5 @@
-import { log } from 'console';
+import { log, warn } from 'console';
 import { WebSocketServer, WebSocket } from 'ws'
-import { v4 as uuid } from 'uuid'
-
 
 class SocketService {
 
@@ -43,8 +41,6 @@ class SocketService {
   onEvents() {
     this._io.on('connection', async (socket, request) => {
 
-      log('connection Established')
-
       if (request.url) {
         const userEmail = request.url.slice('/email='.length)
 
@@ -54,8 +50,12 @@ class SocketService {
         })
       }
 
+      socket.on('message', async (msg) => {
+        log(msg.toString())
+      })
+
       socket.on('disconnect', async () => {
-        log('Disconnection handled properly.')
+        console.log('Handle disconnection gracefully.')
       })
 
     })

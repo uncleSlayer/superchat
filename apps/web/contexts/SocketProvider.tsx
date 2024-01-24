@@ -1,20 +1,16 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import authOptions from '@/app/api/auth/[...nextauth]/options'
+import { log } from 'util'
+
 interface ISocketContext {
-  sendMessage: (msg: string) => any
+  sendMessage: (msg: string) => any,
+  sock: WebSocket | null
 }
 
 export const SocketContext = React.createContext<ISocketContext | null>(null)
 
-export const useSocket = () => {
-  const state = useContext(SocketContext)
-  if (!state) throw new Error('state is not defined')
-
-  return state
-}
 
 const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
@@ -23,8 +19,16 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socketState, setSocketState] = useState<null | WebSocket>(null)
 
   const sendMessage = useCallback((msg: string) => {
-    console.log('server sent: ' + msg);
-  }, [])
+
+    if (socketState && socketState.readyState === WebSocket.OPEN) {
+      socketState.send(msg)
+    } else {
+      console.log(socketState)
+      console.log('something went wrong')
+
+    }
+
+  }, [socketState])
 
   useEffect(() => {
 
@@ -48,7 +52,7 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   }, [session])
 
   return (
-    <SocketContext.Provider value={{ sendMessage }}>
+    <SocketContext.Provider value={{ sendMessage, sock: socketState }}>
       {children}
     </SocketContext.Provider>
   )

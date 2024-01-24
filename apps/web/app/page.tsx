@@ -1,15 +1,16 @@
 'use client'
 
 import { Button } from "@/components/ui/button";
-import { useSocket } from "@/contexts/SocketProvider";
+import { useContext } from 'react'
+import { SocketContext } from '@/contexts/SocketProvider'
 
 const page = () => {
-  const { sendMessage } = useSocket()
+  const sock = useContext(SocketContext)
 
   return (
     <div className="main-container mt-20">
       <p>Welcome to the homepage</p>
-      <Button onClick={() => sendMessage('hello boi')}>
+      <Button onClick={() => sock?.sendMessage('hello boi')}>
         hello
       </Button>
     </div>
