@@ -24,7 +24,7 @@ class SocketService {
 
       this._connections.map((connection) => {
 
-        if (connection.ws.readyState === WebSocket.OPEN) console.log(connection.userEmail, 'is still connected.')
+        if (connection.ws.readyState === WebSocket.OPEN) null
         else {
 
           connection.ws.terminate()

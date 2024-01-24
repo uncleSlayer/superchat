@@ -5,67 +5,70 @@ import authOptions from "../../auth/[...nextauth]/options";
 
 export async function POST(req: NextRequest) {
 
-    try {
+  try {
 
-        const response: {
+    const response: {
 
-            type: 'accept' | 'reject',
-            receiverId: string
+      type: 'accept' | 'reject',
+      receiverId: string
 
-        } = (await req.json())
+    } = (await req.json())
 
-        const loggedInUser = await getServerSession(authOptions)
+    const loggedInUser = await getServerSession(authOptions)
 
-        if (!loggedInUser?.user?.email) return new NextResponse(JSON.stringify({ error: 'You are not a registered of our website.' }))
+    if (!loggedInUser?.user?.email) return new NextResponse(JSON.stringify({ error: 'You are not a registered of our website.' }))
 
-        const loggedInUserInDb = await prisma.user.findFirst({ where: { email: loggedInUser.user.email } })
-        if (!loggedInUserInDb?.id) return new NextResponse(JSON.stringify({ error: 'You are not a registered of our website.' }))
-        const requestToRespond = await prisma.friendRequest.findFirst({
+    const loggedInUserInDb = await prisma.user.findFirst({ where: { email: loggedInUser.user.email } })
 
-            where: {
-                senderUserId: loggedInUserInDb.id,
-                receiverUserId: response.receiverId,
-                status: 'PENDING'
-            }
+    if (loggedInUserInDb?.id !== response.receiverId) return new NextResponse(JSON.stringify({ error: 'You can not receive the request sent by you. You can cancel the request if you want.' }))
 
-        })
+    if (!loggedInUserInDb?.id) return new NextResponse(JSON.stringify({ error: 'You are not a registered of our website.' }))
+    const requestToRespond = await prisma.friendRequest.findFirst({
 
-        if (!requestToRespond) return new NextResponse(JSON.stringify({ error: 'Friend request details not valid' }))
+      where: {
+        senderUserId: loggedInUserInDb.id,
+        receiverUserId: response.receiverId,
+        status: 'PENDING'
+      }
 
-        if (response.type === 'accept') {
+    })
 
-            await prisma.friendRequest.update({
-                where: {
-                    id: requestToRespond.id
-                },
+    if (!requestToRespond) return new NextResponse(JSON.stringify({ error: 'Friend request details not valid' }))
 
-                data: {
-                    status: 'RESOLVED'
-                }
-            })
+    if (response.type === 'accept') {
 
-            return new NextResponse(JSON.stringify({
-                success: true,
-                message: 'Friend request accepted'
-            }))
+      await prisma.friendRequest.update({
+        where: {
+          id: requestToRespond.id
+        },
 
-        } else if (response.type === 'reject') {
-            await prisma.friendRequest.delete({
-                where: {
-                    id: requestToRespond.id
-                }
-            })
-
-            return new NextResponse(JSON.stringify({
-                success: true,
-                message: 'Friend request rejected'
-            }))
+        data: {
+          status: 'RESOLVED'
         }
+      })
 
-    } catch (error) {
-        console.log(error);
-        
-        return new NextResponse(JSON.stringify({ error: error }), { status: 400 })
+      return new NextResponse(JSON.stringify({
+        success: true,
+        message: 'Friend request accepted'
+      }))
+
+    } else if (response.type === 'reject') {
+      await prisma.friendRequest.delete({
+        where: {
+          id: requestToRespond.id
+        }
+      })
+
+      return new NextResponse(JSON.stringify({
+        success: true,
+        message: 'Friend request rejected'
+      }))
     }
+
+  } catch (error) {
+    console.log(error);
+
+    return new NextResponse(JSON.stringify({ error: error }), { status: 400 })
+  }
 
 }
