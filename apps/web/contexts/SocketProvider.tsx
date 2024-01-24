@@ -14,15 +14,21 @@ export const SocketContext = React.createContext<ISocketContext | null>(null)
 
 const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
-  const { data: session } = useSession()
+  const { data, status } = useSession()
 
   const [socketState, setSocketState] = useState<null | WebSocket>(null)
 
   const sendMessage = useCallback((msg: string) => {
 
     if (socketState && socketState.readyState === WebSocket.OPEN) {
-      socketState.send(msg)
+
+      socketState.send(JSON.stringify({
+        from: data?.user?.email,
+        message: msg
+      }))
+
     } else {
+
       console.log(socketState)
       console.log('something went wrong')
 
@@ -32,10 +38,10 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
 
-    if (!session?.user?.email) return;
+    if (!data?.user?.email) return;
 
     if (!socketState) {
-      const _socket = new WebSocket(`ws://localhost:8003/email=${session.user.email}`)
+      const _socket = new WebSocket(`ws://localhost:8003/email=${data.user.email}`)
       setSocketState(_socket)
     }
 
@@ -49,7 +55,7 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
 
-  }, [session])
+  }, [data])
 
   return (
     <SocketContext.Provider value={{ sendMessage, sock: socketState }}>
