@@ -1,64 +1,57 @@
 'use client'
 
 import React, { useCallback, useContext, useEffect, useState } from 'react'
-import { Socket, io } from 'socket.io-client'
 import { useSession } from 'next-auth/react'
 import authOptions from '@/app/api/auth/[...nextauth]/options'
-
 interface ISocketContext {
-    sendMessage: (msg: string) => any
+  sendMessage: (msg: string) => any
 }
 
 export const SocketContext = React.createContext<ISocketContext | null>(null)
 
 export const useSocket = () => {
-    const state = useContext(SocketContext)
-    if (!state) throw new Error('state is not defined')
+  const state = useContext(SocketContext)
+  if (!state) throw new Error('state is not defined')
 
-    return state
+  return state
 }
 
 const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
-    const { data: session } = useSession()
-    const userEmail = session?.user?.email ? session.user.email : null
+  const { data: session } = useSession()
 
-    const [socketState, setSocketState] = useState<null | Socket>(null)
+  const [socketState, setSocketState] = useState<null | WebSocket>(null)
 
-    const sendMessage = useCallback((msg: string) => {
-        console.log('server sent: ' + msg);
-    }, [])
+  const sendMessage = useCallback((msg: string) => {
+    console.log('server sent: ' + msg);
+  }, [])
 
-    useEffect(() => {
+  useEffect(() => {
 
-        if (!session?.user?.email) return;
-        if (socketState) {
-            return;
-        }
-        console.log('here');
-        
-        const _socket = io('http://localhost:8000', {
-            query: {
-                email: userEmail
-            }
-        })
+    if (!session?.user?.email) return;
 
-        setSocketState(_socket)
+    if (!socketState) {
+      const _socket = new WebSocket(`ws://localhost:8003/email=${session.user.email}`)
+      setSocketState(_socket)
+    }
 
-        return () => {
-            console.log(_socket.id);
-            
-            _socket.disconnect()
-            setSocketState(null)
-        }
+    return () => {
 
-    }, [session])
+      if (socketState?.readyState === WebSocket.OPEN) {
 
-    return (
-        <SocketContext.Provider value={{ sendMessage }}>
-            {children}
-        </SocketContext.Provider>
-    )
+        socketState.close()
+        setSocketState(null)
+
+      }
+    }
+
+  }, [session])
+
+  return (
+    <SocketContext.Provider value={{ sendMessage }}>
+      {children}
+    </SocketContext.Provider>
+  )
 }
 
 export default SocketProvider

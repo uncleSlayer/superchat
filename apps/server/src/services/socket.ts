@@ -1,45 +1,65 @@
-import { Server } from 'socket.io'
-import { redis } from './reddis';
+import { log } from 'console';
+import { WebSocketServer, WebSocket } from 'ws'
+import { v4 as uuid } from 'uuid'
+
 
 class SocketService {
 
-    private _io: Server;
+  private _io: WebSocketServer;
+  private _connections: {
+    ws: WebSocket,
+    userEmail: string
+  }[];
 
-    constructor() {
-        this._io = new Server({
-            cors: {
-                allowedHeaders: '*',
-                origin: '*'
-            }
+
+  constructor() {
+    this._io = new WebSocketServer({ port: 8003 })
+    this._connections = []
+  }
+
+  get io() {
+    return this._io
+  }
+
+  checkHealth() {
+    setInterval(() => {
+
+      this._connections.map((connection) => {
+
+        if (connection.ws.readyState === WebSocket.OPEN) console.log(connection.userEmail, 'is still connected.')
+        else {
+
+          connection.ws.terminate()
+          const indexToRemove = this._connections.findIndex(obj => obj.userEmail === connection.userEmail)
+          this._connections.slice(indexToRemove, 1)
+
+        }
+
+      })
+
+    }, 5000)
+  }
+
+  onEvents() {
+    this._io.on('connection', async (socket, request) => {
+
+      log('connection Established')
+
+      if (request.url) {
+        const userEmail = request.url.slice('/email='.length)
+
+        this._connections.push({
+          ws: socket,
+          userEmail
         })
-    }
+      }
 
-    get io() {
-        return this._io
-    }
+      socket.on('disconnect', async () => {
+        log('Disconnection handled properly.')
+      })
 
-    onEvents() {
-        this._io.on('connection', async (socket) => {
-
-            const userEmail = socket.handshake.query.email
-            const socketId = socket.id
-
-            const tempEmailSocket = await redis.get(`userEmail:${userEmail}`)
-            await redis.del(`socketId:${tempEmailSocket}`)
-
-            if (userEmail && socketId && typeof userEmail === 'string' && userEmail !== 'null') await redis.set(`userEmail:${userEmail}`, socketId)
-
-            if (userEmail && socketId && typeof userEmail === 'string' && userEmail !== 'null') await redis.set(`socketId:${socket.id}`, userEmail)
-
-            socket.on('disconnect', async () => {
-
-                const userEmail = await redis.get(`socketId:${socket.id}`)
-                await redis.del(`socketId:${socket.id}`)
-                await redis.del(`userEmail:${userEmail}`)
-
-            })
-        })
-    }
+    })
+  }
 }
 
 export default SocketService
