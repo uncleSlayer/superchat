@@ -9,27 +9,30 @@ import axios from "axios"
 
 const FriendsRequestTable = () => {
 
-    const [friendRequests, setFriendRequests] = useState([{
-        sender: '',
-        receiver: '',
-        senderId: '',
-        receiverId: ''
-    }])
+  const [friendRequests, setFriendRequests] = useState([{
+    sender: '',
+    receiver: '',
+    senderId: '',
+    receiverId: ''
+  }])
 
-    useEffect(() => {
+  useEffect(() => {
 
-        axios.get('/api/friends/request-search')
-            .then((resp) => {
-                setFriendRequests(resp.data.data)
-            })
+    axios.get('/api/friends/request-search')
+      .then((resp) => {
+        setFriendRequests(resp.data.data)
+      })
 
-    }, [])
+  }, [])
 
-    return (
-        <Card className="w-full">
-            <DataTable columns={FriendRequestsColumns} data={friendRequests} />
-        </Card>
-    )
+  return (
+    <>
+      <h3 className='text-3xl my-2'> Friend request sent </h3>
+      <Card className="w-full">
+        <DataTable columns={FriendRequestsColumns} data={friendRequests} />
+      </Card>
+    </>
+  )
 }
 
 export default FriendsRequestTable

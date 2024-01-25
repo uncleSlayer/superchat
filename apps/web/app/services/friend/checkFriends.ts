@@ -12,9 +12,8 @@ export async function checkIfFriends(idOne: string, idTwo: string) {
       }
     })
 
-    if (friendRequest) {
-      return true
-    } else return false
+    if (friendRequest) return true
+    else return false
 
   } catch (error) {
     return error
