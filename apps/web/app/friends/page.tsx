@@ -1,3 +1,5 @@
+'use client'
+
 import SearchFriends from '@/components/app/friends/SearchFriends'
 import React from 'react'
 import FriendsRequestTable from '@/components/app/friends/FriendsRequestsTable'

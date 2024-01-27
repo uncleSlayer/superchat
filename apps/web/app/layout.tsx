@@ -5,7 +5,8 @@ import Nav from '@/components/app/nav/Nav'
 import AuthProvider from '@/contexts/AuthProvider'
 import SocketProvider from '@/contexts/SocketProvider'
 import { ThemeProvider } from '@/contexts/ThemeProvider'
-
+import TanstackQueryProvider from '@/contexts/TanstackQueryProvider'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
+        <TanstackQueryProvider>        <AuthProvider>
           <SocketProvider>
             <ThemeProvider attribute="class"
               defaultTheme="system"
@@ -32,6 +33,7 @@ export default function RootLayout({
             </ThemeProvider>
           </SocketProvider>
         </AuthProvider>
+        </TanstackQueryProvider>
       </body>
     </html>
   )

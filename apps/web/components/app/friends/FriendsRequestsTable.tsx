@@ -26,12 +26,12 @@ const FriendsRequestTable = () => {
   }, [])
 
   return (
-    <>
+    <div className="flex flex-col">
       <h3 className='text-3xl my-2'> Friend request sent </h3>
       <Card className="w-full">
         <DataTable columns={FriendRequestsColumns} data={friendRequests} />
       </Card>
-    </>
+    </div >
   )
 }
 
