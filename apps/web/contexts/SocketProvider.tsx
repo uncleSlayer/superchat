@@ -4,8 +4,14 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { log } from 'util'
 
+type ibMessageType = {
+  to: string,
+  from: string,
+  msg: string
+}
+
 interface ISocketContext {
-  sendMessage: (msg: string) => any,
+  sendMessage: (msg: ibMessageType) => any,
   sock: WebSocket | null
 }
 
@@ -18,13 +24,14 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [socketState, setSocketState] = useState<null | WebSocket>(null)
 
-  const sendMessage = useCallback((msg: string) => {
+  const sendMessage = useCallback((msg: ibMessageType) => {
 
     if (socketState && socketState.readyState === WebSocket.OPEN) {
 
       socketState.send(JSON.stringify({
-        from: data?.user?.email,
-        message: msg
+        from: msg.from,
+        message: msg.msg,
+        to: msg.to
       }))
 
     } else {

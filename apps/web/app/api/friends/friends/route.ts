@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
     return new NextResponse(JSON.stringify({ data: allFriendsObj }))
 
   } catch (error) {
+    console.log(error)
     return new NextResponse(JSON.stringify({ error: error }), { status: 400 })
   }
 
