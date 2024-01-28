@@ -46,7 +46,7 @@ class SocketService {
     })
 
     console.log(toSocket);
-    
+
 
     if (toSocket && toSocket.ws.readyState === WebSocket.OPEN) {
       toSocket.ws.send(JSON.stringify({
@@ -64,6 +64,10 @@ class SocketService {
 
       if (request.url) {
         const userEmail = request.url.slice('/email='.length)
+
+        this._connections.map((el) => {
+          if (el.userEmail === userEmail) this._connections.splice((this._connections.indexOf(el)), 1)
+        })
 
         this._connections.push({
           ws: socket,
