@@ -1,10 +1,8 @@
-import Reddis from 'ioredis'
+import Reddis, { Redis } from 'ioredis'
 
-export const redis = new Reddis({
-    host: 'unclessupermem-otasiddhant-d9a3.a.aivencloud.com',
-    port: 23560,
-    password: 'AVNS_2yIPR0bPCLuPXdJo1fa',
-    username: 'default'
-})
+export const redisPub = new Reddis()
 
-redis.on('error', (err) => console.log('Redis Error', err));
+export const redisSub = new Redis()
+
+redisPub.on('error', (err) => console.log('Redis PUB Error', err));
+redisSub.on('error', (err) => console.log('Redis SUB Error', err))

@@ -7,7 +7,8 @@ import { log } from 'util'
 type ibMessageType = {
   to: string,
   from: string,
-  msg: string
+  msg: string,
+  time: number
 }
 
 interface ISocketContext {
@@ -31,7 +32,8 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       socketState.send(JSON.stringify({
         from: msg.from,
         message: msg.msg,
-        to: msg.to
+        to: msg.to,
+        date: Date.now()
       }))
 
     } else {

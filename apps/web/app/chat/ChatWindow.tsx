@@ -34,7 +34,12 @@ const ChatWindow = ({ friendInfo }: { friendInfo: { id: string, name: string, em
           <Card className='basis-1/6 left-11 flex gap-2 border-none shadow-none items-center py-2'>
             <Input type='text' value={messageText} onChange={(e) => setMessageText(e.target.value)} className='border-2 border-slate-200' />
             <Button onClick={() => {
-              socket?.sendMessage({ to: friendInfo.id, msg: messageText, from: userInformation?.user?.email! })
+              try {
+                socket?.sendMessage({ to: friendInfo.email, msg: messageText, from: userInformation?.user?.email!, time: Date.now() })
+                setMessageText('')
+              } catch (error) {
+                console.log(error)
+              }
             }} className='' variant='default'>Send</Button>
           </Card>
         </div>

@@ -1,5 +1,6 @@
 import { log, warn } from 'console';
 import { WebSocketServer, WebSocket } from 'ws'
+import { redisPub, redisSub } from '../reddis/index'
 
 class SocketService {
 
@@ -38,6 +39,26 @@ class SocketService {
     }, 5000)
   }
 
+  replyIb(to: string, from: string, message: string, time: number) {
+
+    const toSocket = this._connections.find((el) => {
+      if (el.userEmail === to) return el
+    })
+
+    console.log(toSocket);
+    
+
+    if (toSocket && toSocket.ws.readyState === WebSocket.OPEN) {
+      toSocket.ws.send(JSON.stringify({
+        from,
+        message,
+        time
+      }))
+    } else {
+      console.log('My bro is no more connnected. Sad I am now.')
+    }
+  }
+
   onEvents() {
     this._io.on('connection', async (socket, request) => {
 
@@ -51,7 +72,12 @@ class SocketService {
       }
 
       socket.on('message', async (msg) => {
-        log(msg.toString())
+        const msgLocal = JSON.parse(msg.toString())
+
+        redisPub.publish('ib', JSON.stringify(msgLocal), (err, res) => {
+          if (err) console.log(err)
+          console.log(res?.toString())
+        })
       })
 
       socket.on('disconnect', async () => {
