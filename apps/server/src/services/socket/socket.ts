@@ -1,6 +1,5 @@
-import { log, warn } from 'console';
 import { WebSocketServer, WebSocket } from 'ws'
-import { redisPub, redisSub } from '../reddis/index'
+import { redisPub } from '../reddis/index'
 
 class SocketService {
 

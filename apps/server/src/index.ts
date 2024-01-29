@@ -15,4 +15,6 @@ async function init() {
   httpServer.listen(port, () => console.log(`Node server running on port ${port}`))
 }
 
-init()
+setTimeout(() => {
+  init()
+}, 10000);

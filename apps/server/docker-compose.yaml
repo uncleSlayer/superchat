@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping || exit 1"]
+      interval: 10s
+      timeout: 500s
+      retries: 30
+      start_period: 10s
+    
+    ports:
+      - "6379:6379"
+
+  server:
+    build: . 
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"

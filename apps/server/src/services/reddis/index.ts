@@ -1,6 +1,7 @@
 import Reddis, { Redis } from 'ioredis'
 
-export const redisPub = new Reddis()
+export const redisPub = new Reddis({
+})
 
 export const redisSub = new Redis()
 
