@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { log } from 'util'
+import { queryClient } from '@/contexts/TanstackQueryProvider'
 
 type ibMessageType = {
   to: string,
@@ -17,7 +17,6 @@ interface ISocketContext {
 }
 
 export const SocketContext = React.createContext<ISocketContext | null>(null)
-
 
 const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
@@ -51,6 +50,22 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (!socketState) {
       const _socket = new WebSocket(`ws://localhost:8003/email=${data.user.email}`)
+      _socket.onmessage = (ev) => {
+        const msg = JSON.parse(ev.data)
+        try { 
+          console.log(msg.from, msg.message);
+          
+          queryClient.setQueryData(['personal-message', msg.from], (oldData: any) =>
+            oldData ?
+              [
+                ...oldData,
+                { sender: { email: msg.from }, message: msg.message }
+              ] : oldData
+          )
+        } catch (error) {
+          console.log(error);
+        }
+      }
       setSocketState(_socket)
     }
 

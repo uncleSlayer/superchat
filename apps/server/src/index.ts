@@ -11,7 +11,6 @@ async function init() {
   socketService.onEvents()
   socketService.checkHealth()
   await subscribe()
-
   httpServer.listen(port, () => console.log(`Node server running on port ${port}`))
 }
 

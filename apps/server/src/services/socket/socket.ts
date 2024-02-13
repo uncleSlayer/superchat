@@ -1,5 +1,7 @@
 import { WebSocketServer, WebSocket } from 'ws'
 import { redisPub } from '../reddis/index'
+import { prisma } from '../../../prisma';
+import { createMessage } from '../../utils/message';
 
 class SocketService {
 
@@ -38,23 +40,26 @@ class SocketService {
     }, 5000)
   }
 
-  replyIb(to: string, from: string, message: string, time: number) {
+  async replyIb(to: string, from: string, message: string, time: number) {
 
     const toSocket = this._connections.find((el) => {
       if (el.userEmail === to) return el
     })
 
-    console.log(toSocket);
-
-
     if (toSocket && toSocket.ws.readyState === WebSocket.OPEN) {
+
       toSocket.ws.send(JSON.stringify({
         from,
         message,
         time
       }))
+
     } else {
+
+      createMessage(from, to, message)
+
       console.log('My bro is no more connnected. Sad I am now.')
+
     }
   }
 
@@ -77,10 +82,18 @@ class SocketService {
       socket.on('message', async (msg) => {
         const msgLocal = JSON.parse(msg.toString())
 
-        redisPub.publish('ib', JSON.stringify(msgLocal), (err, res) => {
-          if (err) console.log(err)
-          console.log(res?.toString())
-        })
+        try {
+          
+          redisPub.publish('ib', JSON.stringify(msgLocal), (err, res) => {
+            if (err) console.log(err) 
+          })
+
+        } catch (error) {
+          console.log('there is an error: ');
+          
+          console.log(error);
+
+        }
       })
 
       socket.on('disconnect', async () => {

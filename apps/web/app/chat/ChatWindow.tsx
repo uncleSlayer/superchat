@@ -1,12 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { SocketContext } from '@/contexts/SocketProvider'
 import { useSession } from 'next-auth/react'
+import { MoreVertical, VideoIcon, SearchIcon, Send } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { queryClient } from '@/contexts/TanstackQueryProvider'
 
 const ChatWindow = ({ friendInfo }: { friendInfo: { id: string, name: string, email: string, imageUrl: string } | null }) => {
+
+  if (!friendInfo) return <h3>Open chat with a friend to see messages...</h3>
 
   const [messageText, setMessageText] = useState('')
   useEffect(() => {
@@ -16,35 +19,78 @@ const ChatWindow = ({ friendInfo }: { friendInfo: { id: string, name: string, em
   const { data: userInformation, status: userStatus } = useSession()
   if (userStatus === 'loading')
     return (
-      <h1>user data is still loading</h1>
+      <h1>Loading...</h1>
     )
   const socket = useContext(SocketContext)
 
+  const { data: messagesData, isPending, isError } = useQuery({
+    queryKey: ['personal-message', friendInfo.email],
+    queryFn: async () => {
+      const response = await fetch(`/api/chat?otherPersonEmail=${friendInfo.email}`)
+      const data = await response.json()
+      return data.data
+    }
+  })
+
+  if (isPending) return <h3>Loading your messages...</h3>
+  if (isError) return <h3>Something went wrong...</h3>
+
   return (
+
     <div className='h-full'>
       {
         friendInfo && <div className='flex gap-2 flex-col h-full'>
-          <Card className='mb-2 basis-1/6 flex cursor-pointer items-center gap-5 py-2 px-2'>
-            <Avatar>
-              <AvatarImage src={friendInfo.imageUrl} />
-            </Avatar>
-            <h3 className='font-semibold'>{friendInfo.name}</h3>
+          <Card className='mb-2 shadow-none flex cursor-pointer justify-between items-center gap-5 border-none'>
+            <h3 className='font-medium text-xl'>{friendInfo.name}</h3>
+            <div className='flex items-center gap-2'>
+              <SearchIcon className='hover:bg-[rgb(238,238,248)] rounded-full w-8 h-8 p-1' />
+              <VideoIcon className='hover:bg-[rgb(238,238,248)] rounded-full w-8 h-8 p-1' />
+              <MoreVertical className='hover:bg-[rgb(238,238,248)] rounded-full w-8 h-8 p-1' />
+            </div>
           </Card>
-          <Card className='basis-4/6'>display chat</Card>
+          <Card className='basis-4/6 border-none shadow-none overflow-y-scroll'>
+
+            {
+              messagesData.map((message: any, index: number) => {
+                return <ul className='flex flex-col justify-evenly'>
+                  <li className={`${message.sender.email === userInformation?.user?.email ? `bg-[rgb(118,120,237)] w-fit px-5 py-1 mx-3 my-1 rounded-full text-white self-end` : `bg-[rgb(238,238,248)] w-fit px-5 py-1 mx-3 my-1 rounded-full self-start`}`}>
+                    {message.message}
+                  </li>
+                </ul>
+              })
+            }
+
+          </Card>
           <Card className='basis-1/6 left-11 flex gap-2 border-none shadow-none items-center py-2'>
-            <Input type='text' value={messageText} onChange={(e) => setMessageText(e.target.value)} className='border-2 border-slate-200' />
-            <Button onClick={() => {
-              try {
-                socket?.sendMessage({ to: friendInfo.email, msg: messageText, from: userInformation?.user?.email!, time: Date.now() })
-                setMessageText('')
-              } catch (error) {
-                console.log(error)
-              }
-            }} className='' variant='default'>Send</Button>
+            <div className='flex items-center bg-[rgb(238,238,248)] py-1 px-3 rounded-lg w-full'>
+              <Input type='text' value={messageText} placeholder='Message' onChange={(e) => setMessageText(e.target.value)} className='outline-none rounded-none' />
+              <Send onClick={() => {
+
+                try {
+
+                  socket?.sendMessage({ to: friendInfo.email, msg: messageText, from: userInformation?.user?.email!, time: Date.now() })
+                  setMessageText('')
+                  queryClient.setQueryData(['personal-message', friendInfo.email], (oldData: any) =>
+                    oldData ? [
+                      ...oldData,
+                      {
+                        sender: { email: userInformation?.user?.email },
+                        message: messageText
+                      }
+                    ] : oldData
+                  )
+
+                } catch (error) {
+                  console.log(error)
+                }
+
+              }} />
+            </div>
           </Card>
         </div>
       }
     </div>
+
   )
 }
 

@@ -21,7 +21,7 @@ const Nav = () => {
     <Card className="main-container fixed top-0 left-0 right-0 md:top-4 md:left-4 md:right-4 rounded-none md:border-none md:rounded-2xl shadow-lg z-50">
       <div className='flex justify-between items-center'>
         <div className='flex gap-2 items-center'>
-          <h3 className='text-lg'>SuperChat</h3>
+         <img src='/logo.png' className='h-14 w-14 rounded-full' /> 
           <ModeToggle />
 
         </div>

@@ -14,8 +14,8 @@ model User {
   imageUrl              String
   FriendRequestSent     FriendRequest[] @relation("sender")
   FriendRequestReceived FriendRequest[] @relation("receiver")
-  MessagesSent       Messages[]      @relation("messageSender")
-  MessagesReceived      Messages[]      @relation("messageReceiver")
+  MessagesSender        Messages[]      @relation("messageSender")
+  MessagesReceiver      Messages[]      @relation("messageReceiver")
 }
 
 model FriendRequest {
