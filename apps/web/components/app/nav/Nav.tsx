@@ -21,8 +21,12 @@ const Nav = () => {
     <Card className="main-container fixed top-0 left-0 right-0 md:top-4 md:left-4 md:right-4 rounded-none md:border-none md:rounded-2xl shadow-lg z-50">
       <div className='flex justify-between items-center'>
         <div className='flex gap-2 items-center'>
-         <img src='/logo.png' className='h-14 w-14 rounded-full' /> 
+          <img src='/logo.png' className='h-14 w-14 rounded-full' />
           <ModeToggle />
+          <ul className='flex gap-3 items-center'>
+            <li className='' ><Link href={'/friends'} >Friends</Link></li>
+            <li className='' ><Link href={'/chat'} >Chat</Link></li>
+          </ul>
 
         </div>
         <div className='relative'>
@@ -47,7 +51,7 @@ const Nav = () => {
                   <Card className='p-2 w-fit shadow-lg rounded-lg cursor-pointer'>
                     <ul className=''>
                       <li className='mb-3' ><Link href={'/friends'} >Friends</Link></li>
-                      <li className='mb-3' ><Link href={'/profile'} >Profile</Link></li>
+                      <li className='mb-3' ><Link href={'/chat'} >Chat</Link></li>
                       <li className=''><Button className='' onClick={() => signOut()} >Log out</Button></li>
                     </ul>
                   </Card>

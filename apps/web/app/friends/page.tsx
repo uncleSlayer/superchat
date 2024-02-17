@@ -9,7 +9,7 @@ const page = () => {
   return (
     <div className='main-container mt-20'>
       <SearchFriends />
-      <div className='flex gap-3 flex-col md:flex-row'>
+      <div className='flex gap-3 flex-col'>
         <FriendsRequestTable />
         <ShowAllFriends />
       </div>

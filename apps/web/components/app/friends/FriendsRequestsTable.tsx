@@ -5,32 +5,34 @@ import { FriendRequestsSent, FriendRequestsColumns } from "../table/columns/Frie
 import { DataTable } from "../table/table/Data-table"
 import { useEffect, useState } from "react"
 import axios from "axios"
-
+import { useQuery } from "@tanstack/react-query"
+import { getAllSentRequests } from '@/app/actions/friends/sentFriendRequestsAction'
+import { Skeleton } from "@/components/ui/skeleton"
 
 const FriendsRequestTable = () => {
 
-  const [friendRequests, setFriendRequests] = useState([{
-    sender: '',
-    receiver: '',
-    senderId: '',
-    receiverId: ''
-  }])
+  const { data: sentRequsts, isPending, isError } = useQuery({
+    queryKey: ['all-friend-requests'],
+    queryFn: async () => {
 
-  useEffect(() => {
+      const response = await getAllSentRequests()
 
-    axios.get('/api/friends/request-search')
-      .then((resp) => {
-        setFriendRequests(resp.data.data)
-      })
+      if (response.error) return null
+      else {
+        const requests = response.data
+        if (!requests) return
+        return requests.map((request) => ({ receiver: request.receiver.name, receiverId: request.receiverUserId }))
+      }
 
-  }, [])
+    }
+  })
+
+  if (isPending) return <Skeleton className="h-48 w-full" />
 
   return (
     <div className="flex flex-col">
       <h3 className='text-3xl my-2'> Friend request sent </h3>
-      <Card className="w-full">
-        <DataTable columns={FriendRequestsColumns} data={friendRequests} />
-      </Card>
+      {sentRequsts && <DataTable columns={FriendRequestsColumns} data={sentRequsts} />}
     </div >
   )
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { SocketContext } from '@/contexts/SocketProvider'
@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import { MoreVertical, VideoIcon, SearchIcon, Send } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { queryClient } from '@/contexts/TanstackQueryProvider'
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const ChatWindow = ({ friendInfo }: { friendInfo: { id: string, name: string, email: string, imageUrl: string } | null }) => {
 
@@ -39,16 +40,15 @@ const ChatWindow = ({ friendInfo }: { friendInfo: { id: string, name: string, em
 
     <div className='h-full'>
       {
-        friendInfo && <div className='flex gap-2 flex-col h-full'>
+        friendInfo && <div className='flex gap-2 flex-col justify-between h-full'>
           <Card className='mb-2 shadow-none flex cursor-pointer justify-between items-center gap-5 border-none'>
             <h3 className='font-medium text-xl'>{friendInfo.name}</h3>
             <div className='flex items-center gap-2'>
-              <SearchIcon className='hover:bg-[rgb(238,238,248)] rounded-full w-8 h-8 p-1' />
               <VideoIcon className='hover:bg-[rgb(238,238,248)] rounded-full w-8 h-8 p-1' />
               <MoreVertical className='hover:bg-[rgb(238,238,248)] rounded-full w-8 h-8 p-1' />
             </div>
           </Card>
-          <Card className='basis-4/6 border-none shadow-none overflow-y-scroll'>
+          <ScrollArea className='basis-4/6 border-none shadow-none'>
 
             {
               messagesData.map((message: any, index: number) => {
@@ -60,7 +60,7 @@ const ChatWindow = ({ friendInfo }: { friendInfo: { id: string, name: string, em
               })
             }
 
-          </Card>
+          </ScrollArea>
           <Card className='basis-1/6 left-11 flex gap-2 border-none shadow-none items-center py-2'>
             <div className='flex items-center bg-[rgb(238,238,248)] py-1 px-3 rounded-lg w-full'>
               <Input type='text' value={messageText} placeholder='Message' onChange={(e) => setMessageText(e.target.value)} className='outline-none rounded-none' />

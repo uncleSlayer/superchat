@@ -1,42 +1,58 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
 import { columns } from '../table/columns/ShowAllFriendsColumn'
 import { DataTable } from '../table/table/Data-table'
+import { getAllFriends } from '@/app/actions/friends/getAllFriendAction'
+import authOptions from '@/app/api/auth/[...nextauth]/options'
+import { useQuery } from '@tanstack/react-query'
+import { useSession } from 'next-auth/react'
+import { Skeleton } from "@/components/ui/skeleton"
 
 const ShowAllFriends = () => {
 
-  const [friends, setFriends] = useState<null | {
-    id: string,
-    email: string,
-    imageUrl: string,
-    name: string
-  }[]>(null)
+  const { data: friends, isPending, isError } = useQuery({
+    queryKey: ['friends'],
+    queryFn: async function() {
+      const response = await getAllFriends()
+      if (response.error) {
+        return null
+      } else {
 
-  useEffect(() => {
+        const friendList: { id: string, name: string }[] = []
 
-    const allFriends = fetch('http://localhost:3000/api/friends/friends')
+        response.data?.FriendRequestSent.map((request) => {
+          friendList.push({
+            id: request.id,
+            name: request.receiver.name
+          })
+        })
 
-    allFriends.then((resp) => {
-      if (resp.ok) return resp.json()
-    })
-      .then((resp) => {
-        console.log(resp.data)
-        setFriends(resp.data)
-      })
+        response.data?.FriendRequestReceived.map((request) => {
+          friendList.push({
+            id: request.id,
+            name: request.sender.name
+          })
+        })
 
-  }, [])
+        return friendList
 
-  return (
-    <div>
-      <h3 className='text-3xl my-2'> Friends </h3>
-      {
-        friends && (
-          <DataTable data={friends} columns={columns} />
-        )
       }
-    </div>
-  )
+    }
+  })
+
+  if (isPending) return <Skeleton className='w-full h-48 my-2' />
+  {
+    friends && (<DataTable data={friends} columns={columns} />)
+  }
+
+  if (isError) return <h3>Something went wrong...</h3>
+
+  return <div>
+    <h3 className='text-3xl my-2'> Friends </h3>
+    {
+      friends && (<DataTable data={friends} columns={columns} />)
+    }
+  </div>
 }
 
 export default ShowAllFriends
