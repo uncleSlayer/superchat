@@ -1,6 +1,9 @@
 import http from 'http'
 import SocketService from './services/socket/socket'
 import { subscribe } from './services/reddis/handleRedisSub'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 export const socketService = new SocketService()
 
